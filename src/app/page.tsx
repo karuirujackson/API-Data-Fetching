@@ -1,11 +1,12 @@
-import Link from 'next/link';
 import React from 'react';
-import Footer from './components/FetchData';
+import FetchData from './components/FetchData';
+import FetchSinglePatient from './components/FetchSinglePatient';
 
 function Home() {
   return (
     <div>
-      <Link href='/footer'><Footer /></Link>
+      {/* <FetchData /> */}
+      <FetchSinglePatient />
     </div>
   )
 }
