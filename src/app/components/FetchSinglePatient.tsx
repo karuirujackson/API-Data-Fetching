@@ -1,6 +1,8 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
+import { Line } from 'react-chartjs-2';
+import {Chart as ChartJS, LinearScale, PointElement, Title, Tooltip, Legend, CategoryScale, LineElement } from 'chart.js'
 
 const BASE_URL = 'https://fedskillstest.coalitiontechnologies.workers.dev';
 
@@ -14,6 +16,7 @@ const requestAcces = {
     }
 }
 
+ChartJS.register(LinearScale, PointElement, LineElement, Title, Tooltip, Legend, CategoryScale);
 interface PATIENT {
     name: string;
     gender: string;
@@ -75,14 +78,57 @@ export default function FetchData() {
         return <div className="flex mt-5 ml-5 text-red-500 text-2xl">Something went wrong, consider trying again later!</div>
     }
 
+    //Displaying patient data in a graph to show the blood pressure over time
+    const chartData = patient ? {
+        labels: patient.diagnosis_history.map((history) => `${history.month}, ${history.year}`),
+        datasets: [
+            {
+                label: 'Systolic',
+                data: patient.diagnosis_history.map((history) => history.blood_pressure.systolic.value),
+                borderColor: '#E57373',
+                backgroundColor: 'rgba(100, 181, 246, 0.5',
+                tension: 0.4,
+            },
+            {
+                label: 'Diastolic',
+                data: patient.diagnosis_history.map((history) => history.blood_pressure.diastolic.value),
+                borderColor: 'rgba(100, 181, 246, 0.5',
+                backgroundColor: '#64B5F6',
+                tension: 0.4,
+            }
+        ],
+    } : null;
+
+    const chartOptions = {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top as const',
+            },
+            title: {
+                display: true,
+                text: 'Blodd Pressure Over Time'
+            },
+        },
+        scales: {
+            y: {
+                title: {
+                    display: true,
+                    text: 'Blood Pressure (mmHg'
+                },
+                min: 0,
+                max: 200,
+            },
+        },
+    }
 
     return (
-        <div className='flex flex-col mt-3 ml-3 min-h-screen'>
+        <div className='flex flex-col mt-3 ml-3 min-h-screen mx-auto'>
             <h1 className="text-3xl text-cyan-500 underline text-center pb-5 tracking-wider uppercase">Patient Medical Information</h1>
             {
                 patient ? (
-                    <div className='grid grid-cols-1 gap-6'>
-                        <div key={patient.name} className='bg-gray-100 p-4 shadow-lg hover:shadow-2xl rounded-lg transition'>
+                    <div className='grid grid-cols-2 gap-6 shadow-lg hover:shadow-2xl p-4 rounded-lg transition bg-gray-100'>
+                        <div key={patient.name} className='mt-5'>
                             <img src={patient.profile_picture} alt={`${patient.name}'s Profile`} className='w-24 h-24 rounded-full mx-auto mb-4'/>
                             <h2 className="text-xl font-semibold text-center">
                                 {patient.name}
@@ -96,6 +142,14 @@ export default function FetchData() {
                             <p className="text-gray-400 text-center">
                                 <strong>Insurance:</strong> {patient.insurance_type}
                             </p>
+                        </div>
+                        <div className="mt-3">
+                            <h3 className="text-xl font-semibold">Diagnosis History:</h3>
+                            <div className="my-6">
+                                {
+                                    chartData && <Line data={chartData} options={chartOptions} />
+                                }
+                            </div>
                         </div>
                     </div>
                 ) : (
