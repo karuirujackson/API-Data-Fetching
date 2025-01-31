@@ -5,8 +5,8 @@ import FetchSinglePatient from './components/FetchSinglePatient';
 function Home() {
   return (
     <div>
-      {/* <FetchData /> */}
-      <FetchSinglePatient />
+      <FetchData />
+      {/* <FetchSinglePatient /> */}
     </div>
   )
 }
